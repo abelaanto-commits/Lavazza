@@ -1,0 +1,732 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Flow – Concept Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#1B2A5C; --navy-2:#2B3D78; --ink:#16192B; --muted:#6B7085; --line:#E8E3D9;
+  --cream:#F7F3EC; --cream-2:#EFE8DC; --white:#FFFFFF; --bg:#E9E4DA;
+  --coffee:#8A5A3B; --matcha:#6E9A3C; --cold:#3E8FC4; --functional:#E08A2E; --free:#8C78B8; --tea:#B98A2F; --snack:#B5616A;
+  --r:18px; --shadow:0 1px 2px rgba(22,25,43,.04),0 8px 24px rgba(22,25,43,.06);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{background:var(--bg);font-family:"DM Sans",system-ui,-apple-system,sans-serif;color:var(--ink);font-size:15px;line-height:1.45}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+input,select{font:inherit;color:inherit}
+.serif{font-family:"Fraunces",Georgia,serif;font-weight:500;letter-spacing:-.01em}
+
+/* phone shell */
+.stage{min-height:100%;display:flex;align-items:center;justify-content:center;padding:24px}
+.phone{position:relative;width:390px;height:844px;background:var(--cream);border-radius:46px;overflow:hidden;box-shadow:0 0 0 10px #101322,0 30px 80px rgba(0,0,0,.35)}
+@media (max-width:500px){.stage{padding:0;display:block}.phone{width:100%;height:100vh;height:100dvh;border-radius:0;box-shadow:none}}
+.screen{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;padding:56px 20px 110px;scrollbar-width:none}
+.screen::-webkit-scrollbar{display:none}
+.screen.no-nav{padding-bottom:40px}
+@media (max-width:500px){.screen{padding-top:calc(20px + env(safe-area-inset-top))}}
+
+/* nav */
+.nav{position:absolute;left:0;right:0;bottom:0;height:84px;padding:8px 10px calc(14px + env(safe-area-inset-bottom));background:rgba(255,255,255,.92);backdrop-filter:blur(14px);border-top:1px solid var(--line);display:flex;justify-content:space-around;z-index:20}
+.nav button{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10.5px;font-weight:600;letter-spacing:.06em;color:#9A9DAD;width:64px;padding-top:6px}
+.nav button svg{width:22px;height:22px}
+.nav button.on{color:var(--navy)}
+
+/* type + common */
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+h1{font-size:30px;line-height:1.1}
+h2{font-size:21px;line-height:1.2}
+.sub{color:var(--muted)}
+.card{background:var(--white);border-radius:var(--r);box-shadow:var(--shadow);padding:18px}
+.row{display:flex;align-items:center;gap:10px}
+.between{justify-content:space-between}
+.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}.mt24{margin-top:24px}.mt32{margin-top:32px}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:99px;font-size:12px;font-weight:600;background:var(--cream);color:var(--ink)}
+.dot{width:8px;height:8px;border-radius:50%;flex:none}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:15px 18px;border-radius:14px;font-weight:700;letter-spacing:.04em;font-size:14px;background:var(--navy);color:#fff;transition:transform .12s ease,opacity .2s}
+.btn:active{transform:scale(.98)}
+.btn.ghost{background:transparent;color:var(--navy);box-shadow:inset 0 0 0 1.5px var(--navy)}
+.btn.light{background:var(--cream);color:var(--navy)}
+.btn.sm{width:auto;padding:10px 14px;font-size:12.5px;border-radius:12px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:9px 14px;border-radius:99px;background:var(--white);box-shadow:inset 0 0 0 1px var(--line);font-size:13.5px;font-weight:500;transition:all .15s}
+.chip.on{background:var(--navy);color:#fff;box-shadow:none}
+.scroll-x{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:0 -20px;padding:2px 20px}
+.scroll-x::-webkit-scrollbar{display:none}
+.field{display:block;margin-top:14px}
+.field span{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px;letter-spacing:.03em}
+.field input,.field select{width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--line);background:#fff;outline:none}
+.field input:focus,.field select:focus{border-color:var(--navy)}
+.fade{animation:fade .35s ease both}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.concept{font-size:10.5px;color:#9A9DAD;text-align:center;line-height:1.4}
+
+/* home */
+.greet-top{display:flex;justify-content:space-between;align-items:flex-start}
+.avatar{width:42px;height:42px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-weight:700}
+.sim{margin-top:18px;background:var(--white);border-radius:14px;padding:10px 12px;box-shadow:var(--shadow)}
+.sim .chips{flex-wrap:nowrap}
+.sim .chip{padding:7px 11px;font-size:12.5px;white-space:nowrap}
+.stats3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+.stat{background:var(--white);border-radius:14px;padding:11px 12px;box-shadow:var(--shadow)}
+.stat b{display:block;font-size:17px}
+.stat small{font-size:11px;color:var(--muted)}
+.hero{position:relative;border-radius:22px;padding:20px;color:#fff;overflow:hidden;background:var(--navy)}
+.hero .moment{font-size:11px;font-weight:700;letter-spacing:.16em;opacity:.8}
+.hero .glow{position:absolute;right:-50px;top:-50px;width:180px;height:180px;border-radius:50%;opacity:.55;filter:blur(2px)}
+.prodline{display:flex;align-items:center;gap:12px;margin-top:14px;position:relative}
+.pic{width:54px;height:54px;border-radius:16px;display:grid;place-items:center;flex:none}
+.pic svg{width:30px;height:30px}
+.hero .why{margin-top:14px;background:rgba(255,255,255,.1);border-radius:14px;padding:12px 14px;font-size:13px;position:relative}
+.why ul{list-style:none;margin-top:6px}
+.why li{padding-left:16px;position:relative;margin-top:3px}
+.why li:before{content:"";position:absolute;left:2px;top:8px;width:5px;height:5px;border-radius:50%;background:currentColor;opacity:.6}
+.hero .where{display:flex;justify-content:space-between;align-items:center;margin-top:12px;font-size:13px;position:relative}
+.hero .btn{background:#fff;color:var(--navy);margin-top:14px;position:relative}
+.tl{position:relative;margin-top:10px}
+.tl-item{display:flex;gap:12px;position:relative;padding-bottom:12px}
+.tl-item .time{width:44px;font-size:12.5px;font-weight:700;color:var(--muted);padding-top:16px;flex:none}
+.tl-item .card{flex:1;padding:14px}
+.tl-item.past{opacity:.5}
+.mini-moment{font-size:10.5px;font-weight:700;letter-spacing:.14em}
+.why-toggle{font-size:12.5px;font-weight:600;color:var(--navy);margin-top:8px;display:inline-flex;gap:4px;align-items:center}
+.why-box{background:var(--cream);border-radius:12px;padding:10px 12px;font-size:12.5px;margin-top:8px;color:var(--ink)}
+
+/* routine */
+.rt{position:relative;margin-top:18px;padding-left:22px}
+.rt:before{content:"";position:absolute;left:6px;top:8px;bottom:8px;width:2px;background:var(--line);border-radius:2px}
+.rt-item{position:relative;margin-bottom:12px}
+.rt-item:before{content:"";position:absolute;left:-21px;top:20px;width:12px;height:12px;border-radius:50%;background:var(--white);box-shadow:0 0 0 3px var(--c,var(--navy))}
+.rt-item .card{padding:14px 14px 14px 16px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.icon-btn{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:var(--cream)}
+.icon-btn svg{width:16px;height:16px}
+
+/* nearby */
+.map{position:relative;border-radius:22px;overflow:hidden;background:#EDE7DB;box-shadow:var(--shadow);margin-top:14px}
+.map svg{display:block;width:100%;height:auto}
+.marker{cursor:pointer;transition:transform .15s}
+.legend{display:flex;gap:12px;font-size:11.5px;color:var(--muted);margin-top:10px;flex-wrap:wrap}
+.route-banner{margin-top:14px;border-radius:18px;padding:14px 16px;background:var(--navy);color:#fff}
+.route-banner .eyebrow{color:#A9C3FF}
+.pt{display:flex;gap:12px;align-items:flex-start}
+.pt-ico{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;color:#fff;flex:none}
+.pt-ico svg{width:20px;height:20px}
+.tag{font-size:11px;font-weight:700;padding:3px 8px;border-radius:99px;background:#E7F0DC;color:#4F7A22}
+
+/* sheets */
+.overlay{position:absolute;inset:0;background:rgba(16,19,34,.45);z-index:40;display:flex;align-items:flex-end;animation:ov .2s ease both}
+@keyframes ov{from{opacity:0}to{opacity:1}}
+.sheet{width:100%;max-height:92%;overflow-y:auto;background:var(--cream);border-radius:26px 26px 0 0;padding:10px 20px calc(26px + env(safe-area-inset-bottom));animation:up .3s cubic-bezier(.2,.8,.2,1) both;scrollbar-width:none}
+.sheet::-webkit-scrollbar{display:none}
+@keyframes up{from{transform:translateY(40px);opacity:.4}to{transform:none;opacity:1}}
+.grab{width:40px;height:5px;border-radius:9px;background:#D5CFC3;margin:0 auto 14px}
+.seg{display:flex;background:var(--white);border-radius:12px;padding:4px;box-shadow:inset 0 0 0 1px var(--line)}
+.seg button{flex:1;padding:9px 4px;border-radius:9px;font-size:13px;font-weight:600;color:var(--muted)}
+.seg button.on{background:var(--navy);color:#fff}
+.xsell{border-radius:16px;padding:14px;background:var(--white);box-shadow:inset 0 0 0 1.5px var(--line);display:flex;gap:12px;align-items:center;transition:box-shadow .15s}
+.xsell.on{box-shadow:inset 0 0 0 2px var(--matcha);background:#F4F8EE}
+.check{width:24px;height:24px;border-radius:50%;box-shadow:inset 0 0 0 1.5px #C9C3B6;display:grid;place-items:center;flex:none}
+.xsell.on .check{background:var(--matcha);box-shadow:none;color:#fff}
+.total{display:flex;justify-content:space-between;align-items:baseline;margin-top:18px}
+.ready-ring{width:132px;height:132px;margin:8px auto 0;position:relative}
+.ready-ring svg{transform:rotate(-90deg)}
+.ready-ring .lbl{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
+.qr{background:#fff;border-radius:18px;padding:16px;display:grid;place-items:center;box-shadow:var(--shadow)}
+
+/* my flow */
+.bars{display:flex;align-items:flex-end;gap:10px;height:110px;margin-top:14px}
+.bars div{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end}
+.bars i{display:block;width:100%;border-radius:8px 8px 4px 4px;background:var(--navy)}
+.bars small{font-size:11px;color:var(--muted)}
+.mix{display:flex;height:12px;border-radius:9px;overflow:hidden;margin-top:12px}
+.habit{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-top:1px solid var(--line)}
+.habit:first-child{border-top:0}
+.club{border-radius:22px;padding:20px;background:linear-gradient(135deg,#1B2A5C,#0F1734);color:#fff;position:relative;overflow:hidden}
+.prog{height:8px;border-radius:9px;background:rgba(255,255,255,.18);overflow:hidden;margin-top:12px}
+.prog i{display:block;height:100%;background:#E8D5A8;border-radius:9px}
+.tiers{display:flex;gap:6px;margin-top:14px}
+.tiers span{flex:1;text-align:center;font-size:11px;font-weight:700;letter-spacing:.08em;padding:7px 0;border-radius:9px;background:rgba(255,255,255,.08);color:rgba(255,255,255,.6)}
+.tiers span.on{background:#E8D5A8;color:#1B2A5C}
+
+/* profile */
+.menu{background:var(--white);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden}
+.menu button{width:100%;display:flex;justify-content:space-between;align-items:center;padding:16px 18px;border-top:1px solid var(--line);text-align:left}
+.menu button:first-child{border-top:0}
+.toggle{width:46px;height:28px;border-radius:99px;background:#D7D2C7;position:relative;flex:none;transition:background .2s}
+.toggle:after{content:"";position:absolute;left:3px;top:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.toggle.on{background:var(--matcha)}
+.toggle.on:after{transform:translateX(18px)}
+.trow{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:14px 0;border-top:1px solid var(--line)}
+.trow:first-child{border-top:0}
+.trow small{display:block;color:var(--muted);font-size:12px}
+.toast{position:absolute;left:20px;right:20px;bottom:100px;background:var(--ink);color:#fff;border-radius:14px;padding:12px 16px;font-size:13.5px;z-index:60;animation:fade .25s ease both}
+
+/* onboarding */
+.ob-hero{position:absolute;inset:0;background:var(--navy);color:#fff;display:flex;flex-direction:column;justify-content:space-between;padding:70px 28px calc(36px + env(safe-area-inset-bottom));overflow:hidden}
+.ob-hero .orb{position:absolute;border-radius:50%}
+.steps{display:flex;gap:6px}
+.steps i{flex:1;height:4px;border-radius:9px;background:var(--line)}
+.steps i.on{background:var(--navy)}
+.flow-step{display:flex;align-items:center;gap:10px;padding:10px 0;color:rgba(255,255,255,.85);font-size:14px}
+.flow-step b{color:#fff}
+</style>
+</head>
+<body>
+<div class="stage"><div class="phone" id="app"></div></div>
+
+<script>
+/* ================= DATA ================= */
+const CAT = {
+  coffee:{label:"Coffee",color:"var(--coffee)",hex:"#8A5A3B"},
+  cold:{label:"Cold drinks",color:"var(--cold)",hex:"#3E8FC4"},
+  matcha:{label:"Matcha",color:"var(--matcha)",hex:"#6E9A3C"},
+  tea:{label:"Tea",color:"var(--tea)",hex:"#B98A2F"},
+  functional:{label:"Functional",color:"var(--functional)",hex:"#E08A2E"},
+  protein:{label:"Protein",color:"var(--snack)",hex:"#B5616A"},
+  free:{label:"Caffeine-free",color:"var(--free)",hex:"#8C78B8"},
+  food:{label:"Food & snacks",color:"var(--snack)",hex:"#B5616A"}
+};
+const P = {
+  espresso:{name:"Espresso",cat:"coffee",price:1.40,caf:65,prep:2,milk:false,desc:"Single origin blend, short and intense"},
+  cappuccino:{name:"Cappuccino",cat:"coffee",price:2.20,caf:65,prep:3,milk:true,desc:"Espresso with velvety steamed milk"},
+  coldbrew:{name:"Cold Brew",cat:"cold",price:3.50,caf:150,prep:1,milk:false,desc:"Steeped 16 hours, smooth and low acidity"},
+  icedcoffee:{name:"Iced Latte",cat:"cold",price:3.20,caf:65,prep:3,milk:true,desc:"Espresso over ice with cold milk"},
+  matcha:{name:"Iced Matcha Latte",cat:"matcha",price:4.20,caf:60,prep:4,milk:true,desc:"Ceremonial-grade matcha, whisked to order"},
+  chai:{name:"Chai Latte",cat:"tea",price:3.60,caf:40,prep:3,milk:true,desc:"Black tea with cardamom, cinnamon and ginger"},
+  greentea:{name:"Premium Green Tea",cat:"tea",price:2.80,caf:30,prep:2,milk:false,desc:"Japanese sencha, light and fresh"},
+  electrolyte:{name:"Electrolyte Hydration Drink",cat:"functional",price:2.90,caf:0,prep:1,milk:false,desc:"Sodium, potassium and magnesium, lightly citrus"},
+  focus:{name:"Focus Drink",cat:"functional",price:3.20,caf:40,prep:1,milk:false,desc:"Green tea caffeine with B vitamins and magnesium"},
+  protein:{name:"Protein Shake",cat:"protein",price:3.90,caf:0,prep:2,milk:true,desc:"20 g protein, cocoa or vanilla"},
+  botanical:{name:"Botanical Tea",cat:"free",price:2.60,caf:0,prep:2,milk:false,desc:"Chamomile, lemon balm and orange peel"},
+  cornetto:{name:"Cornetto",cat:"food",price:1.50,caf:0,prep:0,food:true,desc:"Freshly baked every morning"},
+  proteinbar:{name:"Protein Bar",cat:"food",price:2.50,caf:0,prep:0,food:true,desc:"Almond & dark chocolate, 15 g protein"},
+  proteinsnack:{name:"Protein Snack",cat:"food",price:2.20,caf:0,prep:0,food:true,desc:"Roasted chickpeas & seeds"},
+  sandwich:{name:"Focaccia Sandwich",cat:"food",price:4.50,caf:0,prep:0,food:true,desc:"Mozzarella, tomato and basil"},
+  yogurt:{name:"Yogurt Bowl",cat:"food",price:3.80,caf:0,prep:0,food:true,desc:"Greek yogurt, granola and berries"}
+};
+const TYPES = {
+  store:{label:"Flow Store",color:"#1B2A5C",desc:"Full experience, complete portfolio"},
+  corner:{label:"Flow Corner",color:"#8A5A3B",desc:"Small counter, fast pick-up"},
+  machine:{label:"Flow Machine",color:"#6E9A3C",desc:"Smart vending, 24/7 pre-order"}
+};
+const ALL_DRINKS = Object.keys(P).filter(k=>!P[k].food);
+const POINTS = [
+  {id:"luiss",name:"LUISS Viale Romania",type:"machine",x:172,y:58,dist:"80 m",walk:"1 min",hours:"07:00 – 22:00",products:["espresso","cappuccino","coldbrew","matcha","focus","electrolyte","greentea","proteinbar","cornetto"]},
+  {id:"policlinico",name:"Metro Policlinico",type:"corner",x:205,y:150,dist:"350 m",walk:"4 min",hours:"06:30 – 21:00",products:["espresso","cappuccino","icedcoffee","matcha","chai","focus","cornetto","proteinbar","yogurt"]},
+  {id:"bologna",name:"Piazza Bologna",type:"corner",x:268,y:126,dist:"1.1 km",walk:"13 min",hours:"07:00 – 22:00",products:["espresso","cappuccino","coldbrew","electrolyte","protein","greentea","proteinsnack","proteinbar","sandwich"]},
+  {id:"termini",name:"Roma Termini",type:"store",x:178,y:226,dist:"2.4 km",walk:"9 min metro",hours:"05:30 – 23:30",products:ALL_DRINKS.concat(["cornetto","proteinbar","proteinsnack","sandwich","yogurt"])},
+  {id:"borghese",name:"Villa Borghese",type:"machine",x:108,y:120,dist:"1.9 km",walk:"22 min",hours:"24/7",products:["espresso","coldbrew","matcha","electrolyte","botanical","proteinbar"]},
+  {id:"tiburtina",name:"Stazione Tiburtina",type:"machine",x:298,y:206,dist:"700 m",walk:"8 min",hours:"24/7",products:["espresso","cappuccino","greentea","botanical","electrolyte","chai","proteinsnack"]},
+  {id:"eur",name:"EUR – Viale Europa",type:"store",x:44,y:282,dist:"9.8 km",walk:"25 min metro",hours:"07:00 – 21:00",products:ALL_DRINKS.concat(["cornetto","proteinbar","sandwich","yogurt"])}
+];
+const RCAT = {
+  commute:{label:"Commute",c:"#9A9DAD"}, study:{label:"Study",c:"#1B2A5C"}, work:{label:"Work",c:"#2B3D78"},
+  meal:{label:"Meal",c:"#B5616A"}, sport:{label:"Sport",c:"#E08A2E"}, free:{label:"Free time",c:"#8C78B8"}, home:{label:"Home",c:"#6E9A3C"}
+};
+
+/* ================= STATE ================= */
+const S = {
+  onboarded:false, obStep:0,
+  user:{name:"Antonio",age:22,occ:"Student",prefs:["coffee","matcha","cold","functional"],caffeine:"Moderate",diet:"None",wake:"07:15",sleep:"23:30"},
+  consent:{personal:true,location:true,calendar:false,history:true,offers:false},
+  routine:[
+    {id:1,time:"08:00",title:"Leave home",place:"Via Nomentana",cat:"commute"},
+    {id:2,time:"08:45",title:"University – LUISS",place:"Viale Romania, Roma",cat:"study"},
+    {id:3,time:"13:00",title:"Lunch with friends",place:"LUISS campus",cat:"meal"},
+    {id:4,time:"15:00",title:"Library session",place:"Biblioteca LUISS",cat:"study"},
+    {id:5,time:"18:30",title:"Gym",place:"FitLab, Piazza Bologna",cat:"sport"},
+    {id:6,time:"21:00",title:"Dinner at home",place:"Via Nomentana",cat:"home"}
+  ],
+  nextId:7,
+  tab:"home", simTime:"08:00", openWhy:null,
+  sheet:null, // {kind, ...}
+  points:1240, plus:false,
+  week:{drinks:8,places:4,spent:32,mix:{coffee:3,cold:2,functional:2,tea:1},days:[1,2,1,0,2,1,1]},
+  ordered:[], // today's orders: {pid,time}
+  mapFilter:"all", mapSel:null, toast:null
+};
+const SIM_TIMES = ["08:00","12:30","15:00","18:00","21:00"];
+
+/* ================= HELPERS ================= */
+const $ = s=>document.querySelector(s);
+const min = t=>{const [h,m]=t.split(":").map(Number);return h*60+m};
+const hhmm = m=>{m=Math.max(0,m);return String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0")};
+const eur = n=>"€"+n.toFixed(2).replace(".",",");
+const esc = s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const pt = id=>POINTS.find(p=>p.id===id);
+const sorted = ()=>[...S.routine].sort((a,b)=>min(a.time)-min(b.time));
+function pointFor(ev){
+  const s=(ev.place+" "+ev.title).toLowerCase();
+  if(/luiss|univers|librar|bibliotec|romania/.test(s)) return "luiss";
+  if(/gym|palestr|bologna|fitlab/.test(s)) return "bologna";
+  if(/home|casa|nomentana/.test(s)) return "tiburtina";
+  if(/termini/.test(s)) return "termini";
+  if(/eur/.test(s)) return "eur";
+  if(/borghese/.test(s)) return "borghese";
+  return "policlinico";
+}
+function toast(msg){S.toast=msg;render();clearTimeout(toast.t);toast.t=setTimeout(()=>{S.toast=null;render()},2200)}
+
+/* ================= ICONS ================= */
+const I = {
+  home:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>',
+  routine:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+  pin:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>',
+  chart:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>',
+  user:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6" stroke-linecap="round"/></svg>',
+  plus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+  edit:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>',
+  trash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>',
+  chev:'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m9 6 6 6-6 6"/></svg>',
+  check:'<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>',
+  close:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>',
+  cal:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4" stroke-linecap="round"/></svg>',
+  shield:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3 4 6v6c0 4.5 3.4 8 8 9 4.6-1 8-4.5 8-9V6z"/><path d="m9 12 2 2 4-4" stroke-linecap="round"/></svg>',
+  store:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 9h16l-1-5H5zM5 9v11h14V9M10 20v-5h4v5"/></svg>',
+  corner:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 11h11v4a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5zM16 12h1.5a2.5 2.5 0 0 1 0 5H16M8 4c0 2 2 2 2 4M12 4c0 2 2 2 2 4"/></svg>',
+  machine:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 7h6M9 17h6M10 11h4v3h-4z"/></svg>'
+};
+function drinkIcon(cat){
+  const c=CAT[cat].hex;
+  if(cat==="food") return `<svg viewBox="0 0 32 32" fill="none" stroke="${c}" stroke-width="2" stroke-linecap="round"><path d="M6 20c0-6 4-10 10-10s10 4 10 10zM4 20h24M10 14l2 2M16 12v3M22 14l-2 2"/></svg>`;
+  if(cat==="cold"||cat==="matcha") return `<svg viewBox="0 0 32 32" fill="none" stroke="${c}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 9h16l-2 19H10zM8 15h16M18 3l-2 6"/><rect x="12" y="18" width="3" height="3" rx=".6"/><rect x="16.5" y="21" width="3" height="3" rx=".6"/></svg>`;
+  if(cat==="functional"||cat==="protein") return `<svg viewBox="0 0 32 32" fill="none" stroke="${c}" stroke-width="2" stroke-linejoin="round"><path d="M12 3h8v4l2 3v17a2 2 0 0 1-2 2h-8a2 2 0 0 1-2-2V10l2-3z"/><path d="M10 15h12M17 18l-3 4h4l-3 4" stroke-linecap="round"/></svg>`;
+  return `<svg viewBox="0 0 32 32" fill="none" stroke="${c}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 13h16v6a7 7 0 0 1-7 7h-2a7 7 0 0 1-7-7zM22 15h2a3 3 0 0 1 0 6h-2M11 4c0 2.5 2 2.5 2 5M16 4c0 2.5 2 2.5 2 5"/></svg>`;
+}
+const pic = (pid,size=54)=>{const c=CAT[P[pid].cat];return `<div class="pic" style="width:${size}px;height:${size}px;background:${c.hex}1A">${drinkIcon(P[pid].cat)}</div>`};
+
+/* ================= RECOMMENDATION ENGINE ================= */
+function buildFlow(){
+  const out=[]; const ev=sorted();
+  const likes=k=>S.user.prefs.includes(k);
+  const lowCaf=S.user.caffeine==="Low"||S.user.caffeine==="None";
+  let coffees=S.user.caffeine==="None"?0:1; // habitual coffee at home
+  let caf=coffees*65;
+  ev.forEach((e,i)=>{
+    const t=min(e.time); const next=ev[i+1];
+    let r=null; const why=[];
+    if(e.cat==="commute") return;
+    if((e.cat==="study"||e.cat==="work") && t<12*60){
+      const pid = lowCaf ? (likes("matcha")?"matcha":"greentea") : (coffees>=2?"matcha":"espresso");
+      const pair = next&&next.cat==="meal" && min(next.time)-t>180 ? "proteinbar" : "cornetto";
+      r={moment:"FOCUS",title:"Start focused",pid,pair,slot:t-30,label:"Before "+(e.cat==="study"?"class":"work")};
+      why.push(`You have ${e.title.split(" –")[0].toLowerCase()} at ${e.time}`);
+      why.push(pid==="espresso"?"You usually pick espresso in the morning":"You prefer lower caffeine");
+      if(next) why.push(`Your next break is at ${next.time}`);
+    } else if(e.cat==="meal" && t<16*60){
+      const pid = coffees>=2 ? (likes("tea")?"greentea":"greentea") : (likes("cold")?"coldbrew":"cappuccino");
+      r={moment:"FUEL",title:"Lunch break",pid,pair:"sandwich",slot:t-10,label:"Lunch"};
+      why.push(`Lunch is at ${e.time}`);
+      why.push(coffees>=2?`You already had ${coffees} coffees today`:"A cold coffee pairs well with a light lunch");
+    } else if((e.cat==="study"||e.cat==="work") && t<19*60){
+      const pid = coffees>=2 || caf>=200 ? (likes("matcha")?"matcha":"chai") : (likes("cold")?"icedcoffee":"cappuccino");
+      const dur = next?Math.round((min(next.time)-t)/60):2;
+      r={moment:"REFRESH",title:"Refresh",pid,pair:"proteinbar",slot:t+30,label:"During study"};
+      why.push(`You have a ${dur}-hour ${e.cat==="study"?"study":"work"} session`);
+      if(likes("cold")) why.push("You usually choose cold drinks in the afternoon");
+      if(coffees>=2) why.push(`You already had ${coffees} coffees today`);
+    } else if(e.cat==="sport"){
+      r={moment:"FUEL",title:"Hydrate",pid:"electrolyte",pair:"proteinsnack",slot:t-30,label:"Before workout"};
+      why.push(`Your workout starts at ${e.time}`);
+      why.push("Caffeine-free, so it won't affect your evening");
+      why.push("Pick-up point is next to your gym");
+    } else if(e.cat==="home"||e.cat==="meal"||t>=19*60){
+      r={moment:"UNWIND",title:"Slow down",pid:"botanical",pair:null,slot:Math.max(t-20,19*60),label:"Evening"};
+      why.push(`You usually go to sleep at ${S.user.sleep}`);
+      why.push("Caffeine-free after 19:00");
+    } else {
+      r={moment:"RESET",title:"Reset",pid:"greentea",pair:null,slot:t-15,label:RCAT[e.cat].label};
+      why.push(`You have “${e.title}” at ${e.time}`);
+    }
+    r.ev=e; r.point=pointFor(e); r.why=why; r.id="r"+e.id;
+    r.detour = r.point==="policlinico"?3:r.point==="luiss"?0:2;
+    if(P[r.pid].cat==="coffee"||r.pid==="coldbrew"||r.pid==="icedcoffee") coffees++;
+    caf+=P[r.pid].caf;
+    out.push(r);
+  });
+  // morning first rec goes to Policlinico (on route)
+  const f=out.find(o=>o.moment==="FOCUS"); if(f){f.point="policlinico";f.detour=3}
+  return out;
+}
+const MOM = {FOCUS:"#8A5A3B",REFRESH:"#6E9A3C",FUEL:"#E08A2E",RESET:"#B98A2F",UNWIND:"#8C78B8"};
+function crossSellText(r, pair){
+  if(!pair) return "";
+  const ev=sorted(); const idx=ev.findIndex(e=>e.id===r.ev.id); const next=ev[idx+1];
+  if(pair==="proteinbar"&&next&&next.cat==="meal") return `You have lunch in ${Math.round((min(next.time)-r.slot)/60)} hours. Add a Protein Bar for ${eur(P.proteinbar.price)}.`;
+  if(pair==="proteinsnack") return `You're heading to the gym. Complete your Flow with a Protein Snack.`;
+  if(pair==="sandwich") return `Skip the lunch queue: add a Focaccia Sandwich, ready with your drink.`;
+  if(pair==="cornetto") return `Leaving early? Add a fresh Cornetto for ${eur(P.cornetto.price)}.`;
+  if(pair==="proteinbar") return `Long session ahead. Add a Protein Bar for ${eur(P.proteinbar.price)}.`;
+  return `Pairs well with ${P[pair].name}.`;
+}
+
+/* ================= SCREENS ================= */
+function nav(){
+  const t=[["home","HOME",I.home],["routine","ROUTINE",I.routine],["nearby","NEARBY",I.pin],["myflow","MY FLOW",I.chart],["profile","PROFILE",I.user]];
+  return `<nav class="nav">${t.map(([k,l,ic])=>`<button class="${S.tab===k?"on":""}" data-a="tab" data-v="${k}">${ic}${l}</button>`).join("")}</nav>`;
+}
+
+function homeScreen(){
+  const flow=buildFlow(); const now=min(S.simTime);
+  const nextIdx=flow.findIndex(r=>r.slot>=now-20);
+  const hero=nextIdx>=0?flow[nextIdx]:null;
+  const h=Math.floor(now/60); const greet=h<12?"Good morning":h<18?"Good afternoon":"Good evening";
+  const cafToday = flow.filter(r=>r.slot<now-20).reduce((s,r)=>s+P[r.pid].caf,0) + (S.user.caffeine==="None"?0:65) + S.ordered.reduce((s,o)=>s+P[o.pid].caf,0);
+  const nextEv = sorted().find(e=>min(e.time)>=now);
+  let html=`<div class="screen fade">
+  <div class="greet-top"><div><div class="eyebrow">${["Mon","Tue","Wed","Thu","Fri"][2]} · ${S.simTime}</div><h1 class="serif mt8">${greet},<br>${esc(S.user.name)}</h1><p class="sub mt8">Here's your Flow for today.</p></div><button class="avatar" data-a="tab" data-v="profile">${esc(S.user.name[0])}</button></div>
+  <div class="sim"><div class="row between"><span class="eyebrow" style="font-size:10px">Demo · simulate time of day</span></div>
+   <div class="chips mt8 scroll-x" style="margin:8px -12px 0;padding:0 12px">${SIM_TIMES.map(t=>`<button class="chip ${S.simTime===t?"on":""}" data-a="sim" data-v="${t}">${t}</button>`).join("")}</div></div>
+  <div class="stats3">
+   <div class="stat"><b>${Math.round(cafToday)} mg</b><small>caffeine today</small></div>
+   <div class="stat"><b>${S.points.toLocaleString("en")}</b><small>Flow points</small></div>
+   <div class="stat"><b>${nextEv?nextEv.time:"—"}</b><small>${nextEv?esc(RCAT[nextEv.cat].label.toLowerCase())+" next":"day done"}</small></div>
+  </div>`;
+  if(hero){
+    const c=MOM[hero.moment]; const p=pt(hero.point); const open=S.openWhy===hero.id;
+    html+=`<div class="eyebrow mt24">Next up</div>
+    <div class="hero mt12"><div class="glow" style="background:radial-gradient(circle,${c},transparent 70%)"></div>
+      <div class="row between" style="position:relative"><span class="moment">${hero.moment} · ${hhmm(hero.slot)}</span><span class="pill" style="background:rgba(255,255,255,.14);color:#fff">${esc(hero.label)}</span></div>
+      <h2 class="serif mt8" style="position:relative;font-size:26px">“${hero.title}”</h2>
+      <div class="prodline"><div class="pic" style="background:#fff">${drinkIcon(P[hero.pid].cat)}</div>
+        <div><b style="font-size:16px">${P[hero.pid].name}</b>${hero.pair?`<div style="opacity:.75;font-size:13px">+ ${P[hero.pair].name}</div>`:""}</div></div>
+      <div class="why"><b style="font-size:12.5px">Why this recommendation?</b><ul>${hero.why.map(w=>`<li>${esc(w)}</li>`).join("")}</ul></div>
+      <div class="where"><span>${I.pin.replace('<svg','<svg width="14" height="14" style="vertical-align:-2px;margin-right:4px"')}Flow ${TYPES[p.type].label.split(" ")[1]} · ${p.name}</span><b>${hero.detour?`+${hero.detour} min`:"on site"}</b></div>
+      <button class="btn" data-a="order" data-v="${hero.id}">ORDER NOW</button>
+    </div>`;
+  } else {
+    html+=`<div class="card mt24"><b>Your Flow is complete for today.</b><p class="sub mt8">See you tomorrow morning.</p></div>`;
+  }
+  const rest=flow.filter(r=>!hero||r.id!==hero.id);
+  html+=`<div class="row between mt24"><div class="eyebrow">Your day</div><button class="eyebrow" style="color:var(--navy)" data-a="tab" data-v="routine">Edit routine</button></div><div class="tl">`;
+  rest.forEach(r=>{
+    const past=r.slot<now-20; const open=S.openWhy===r.id; const p=pt(r.point);
+    html+=`<div class="tl-item ${past?"past":""}"><div class="time">${hhmm(r.slot)}</div><div class="card">
+      <div class="row between"><span class="mini-moment" style="color:${MOM[r.moment]}">${r.moment}</span><span class="sub" style="font-size:12px">${past?"Done":esc(r.label)}</span></div>
+      <div class="row mt8">${pic(r.pid,44)}<div style="flex:1;min-width:0"><b>${P[r.pid].name}</b><div class="sub" style="font-size:12.5px">${r.pair?"+ "+P[r.pair].name+" · ":""}${p.name}</div></div>
+      ${past?"":`<button class="btn sm" data-a="order" data-v="${r.id}">Order</button>`}</div>
+      <button class="why-toggle" data-a="why" data-v="${r.id}">Why this? ${open?"−":"+"}</button>
+      ${open?`<div class="why-box"><ul style="list-style:none">${r.why.map(w=>`<li style="margin-top:2px">• ${esc(w)}</li>`).join("")}</ul></div>`:""}
+    </div></div>`;
+  });
+  html+=`</div><p class="concept mt16">Recommendations are simulated from routine, time, preferences and today's intake.</p></div>`;
+  return html;
+}
+
+function routineScreen(){
+  const ev=sorted();
+  return `<div class="screen fade">
+  <div class="eyebrow">My Routine</div><h1 class="serif mt8">Your typical day</h1>
+  <p class="sub mt8">Flow uses only what you add here to time your suggestions.</p>
+  <div class="row mt16" style="gap:8px">
+    <button class="btn" style="flex:1" data-a="addEv">${I.plus.replace('<svg','<svg width="18" height="18"')} Add activity</button>
+    <button class="btn ghost" style="flex:1" data-a="cal">${I.cal} Connect Calendar</button>
+  </div>
+  <div class="rt">${ev.map(e=>`<div class="rt-item" style="--c:${RCAT[e.cat].c}"><div class="card">
+     <div style="min-width:0"><div class="row" style="gap:8px"><b style="font-size:15px">${e.time}</b><span class="pill" style="font-size:11px;padding:3px 8px"><span class="dot" style="background:${RCAT[e.cat].c}"></span>${RCAT[e.cat].label}</span></div>
+     <div style="font-weight:600;margin-top:4px">${esc(e.title)}</div><div class="sub" style="font-size:12.5px">${esc(e.place||"—")}</div></div>
+     <div class="row" style="gap:6px"><button class="icon-btn" aria-label="Edit" data-a="editEv" data-v="${e.id}">${I.edit}</button><button class="icon-btn" aria-label="Delete" data-a="delEv" data-v="${e.id}">${I.trash}</button></div>
+   </div></div>`).join("")}</div>
+  </div>`;
+}
+
+function mapSVG(route){
+  const f=S.mapFilter;
+  const vis=POINTS.filter(p=>f==="all"||p.type===f);
+  return `<svg viewBox="0 0 340 300" role="img" aria-label="Map of Flow points in Rome">
+   <rect width="340" height="300" fill="#EFE9DE"/>
+   <path d="M0 40 C40 70 60 100 52 140 C44 180 70 210 60 250 C55 270 70 290 80 300" stroke="#BFD6E6" stroke-width="10" fill="none" stroke-linecap="round"/>
+   <ellipse cx="108" cy="118" rx="44" ry="30" fill="#D9E5C8"/>
+   <g stroke="#FFFFFF" stroke-width="6" stroke-linecap="round" fill="none">
+     <path d="M60 30 L320 70"/><path d="M80 100 L330 150"/><path d="M90 190 L330 230"/><path d="M150 0 L210 300"/><path d="M250 0 L280 300"/><path d="M100 300 L320 110"/>
+   </g>
+   <g stroke="#FFFFFF" stroke-width="3" fill="none" opacity=".8"><path d="M20 160 L330 190"/><path d="M200 0 L120 300"/><path d="M0 230 L170 260"/></g>
+   ${route?`<path d="M282 196 L246 178 L205 150 L196 108 L172 58" stroke="#1B2A5C" stroke-width="4" fill="none" stroke-dasharray="1 8" stroke-linecap="round"/>
+   <circle cx="282" cy="196" r="7" fill="#fff" stroke="#1B2A5C" stroke-width="3"/><text x="282" y="216" font-size="9" text-anchor="middle" fill="#1B2A5C" font-weight="700">HOME</text>`:""}
+   <text x="108" y="146" font-size="8" text-anchor="middle" fill="#7C9466">Villa Borghese</text>
+   <text x="62" y="294" font-size="8" fill="#9A9DAD">↙ EUR</text>
+   ${vis.map(p=>{const sel=S.mapSel===p.id;const col=TYPES[p.type].color;const r=sel?14:p.type==="store"?12:10;
+     return `<g class="marker" data-a="mapSel" data-v="${p.id}"><circle cx="${p.x}" cy="${p.y}" r="${r+5}" fill="${col}" opacity="${sel?.2:.12}"/><circle cx="${p.x}" cy="${p.y}" r="${r}" fill="${col}" stroke="#fff" stroke-width="2.5"/>
+     <text x="${p.x}" y="${p.y+3.5}" font-size="${p.type==="store"?10:9}" text-anchor="middle" fill="#fff" font-weight="700">${p.type==="store"?"S":p.type==="corner"?"C":"M"}</text></g>`}).join("")}
+  </svg>`;
+}
+function nearbyScreen(){
+  const now=min(S.simTime);
+  const nextEv=sorted().find(e=>min(e.time)>=now && e.cat!=="commute")||sorted()[1];
+  const onRoute = now<10*60;
+  const tgt = onRoute?pt("policlinico"):pt(pointFor(nextEv));
+  const list = POINTS.filter(p=>S.mapFilter==="all"||p.type===S.mapFilter);
+  const sel = S.mapSel?pt(S.mapSel):null;
+  const card = p=>`<div class="card mt12 ${S.mapSel===p.id?"fade":""}" style="${S.mapSel===p.id?"box-shadow:inset 0 0 0 2px "+TYPES[p.type].color+",var(--shadow)":""}" data-a="mapSel" data-v="${p.id}">
+    <div class="pt"><div class="pt-ico" style="background:${TYPES[p.type].color}">${I[p.type]}</div>
+    <div style="flex:1;min-width:0"><div class="row between"><b>${p.name}</b>${p.id===tgt.id?`<span class="tag">ON YOUR ROUTE</span>`:""}</div>
+    <div class="sub" style="font-size:12.5px">${TYPES[p.type].label} · ${p.dist} · ${p.walk}</div>
+    <div class="sub" style="font-size:12.5px">Open ${p.hours} · <b style="color:var(--matcha)">Order ahead</b></div>
+    <div class="row mt8" style="gap:4px;flex-wrap:wrap">${[...new Set(p.products.map(k=>P[k].cat))].map(c=>`<span class="dot" title="${CAT[c].label}" style="background:${CAT[c].hex}"></span>`).join("")}<span class="sub" style="font-size:11.5px;margin-left:4px">${p.products.length} products</span></div>
+    ${S.mapSel===p.id?`<button class="btn sm mt12" data-a="orderAt" data-v="${p.id}">Order here</button>`:""}
+    </div></div></div>`;
+  return `<div class="screen fade">
+   <div class="eyebrow">Nearby</div><h1 class="serif mt8">Flow points</h1>
+   <div class="route-banner"><div class="eyebrow">On your route</div>
+    <div style="margin-top:6px;font-size:14.5px">${onRoute?`You're going to <b>LUISS</b>.<br>Flow Corner <b>Policlinico</b> adds only <b>3 minutes</b> to your route.`:`Next: <b>${esc(nextEv.title)}</b> at ${nextEv.time}.<br><b>${tgt.name}</b> is ${tgt.walk} from there.`}</div></div>
+   <div class="map">${mapSVG(onRoute)}</div>
+   <div class="legend">${Object.entries(TYPES).map(([k,t])=>`<span class="row" style="gap:5px"><span class="dot" style="background:${t.color}"></span>${t.label}</span>`).join("")}</div>
+   <div class="seg mt16">${[["all","All"],["store","Store"],["corner","Corner"],["machine","Machine"]].map(([k,l])=>`<button class="${S.mapFilter===k?"on":""}" data-a="filter" data-v="${k}">${l}</button>`).join("")}</div>
+   ${(sel&&list.includes(sel)?[sel,...list.filter(p=>p!==sel)]:list).map(card).join("")}
+  </div>`;
+}
+
+function myflowScreen(){
+  const w=S.week; const tot=Object.values(w.mix).reduce((a,b)=>a+b,0); const mx=Math.max(...w.days,1);
+  const toNext=Math.max(0,1500-S.points);
+  const tier = S.points>=5000?"Flow Black":S.points>=2000?"Flow Plus":"Flow";
+  return `<div class="screen fade">
+   <div class="eyebrow">My Flow</div><h1 class="serif mt8">This week</h1>
+   <div class="stats3"><div class="stat"><b>${w.drinks}</b><small>drinks</small></div><div class="stat"><b>${w.places}</b><small>Flow points visited</small></div><div class="stat"><b>${eur(w.spent).replace(",00","")}</b><small>spent</small></div></div>
+   <div class="card mt16"><b>Your mix</b><div class="mix">${Object.entries(w.mix).filter(([,v])=>v).map(([k,v])=>`<i style="width:${v/tot*100}%;background:${CAT[k].hex}"></i>`).join("")}</div>
+    <div class="legend" style="margin-top:12px">${Object.entries(w.mix).filter(([,v])=>v).map(([k,v])=>`<span class="row" style="gap:5px"><span class="dot" style="background:${CAT[k].hex}"></span>${v} ${CAT[k].label.toLowerCase()}</span>`).join("")}</div>
+    <div class="bars">${w.days.map((d,i)=>`<div><i style="height:${Math.max(6,d/mx*80)}px;${i===2?"":"opacity:.35"}"></i><small>${"MTWTFSS"[i]}</small></div>`).join("")}</div>
+   </div>
+   <div class="card mt16"><b>Your habits</b><div class="mt8">
+    ${[["Morning","Coffee","coffee"],["Afternoon","Cold drinks & matcha","matcha"],["Pre-workout","Functional drinks","functional"],["Evening","Caffeine-free","free"]].map(([a,b,c])=>`<div class="habit"><span class="sub">${a}</span><span class="row" style="gap:8px"><span class="dot" style="background:${CAT[c].hex}"></span><b style="font-size:14px">${b}</b></span></div>`).join("")}
+   </div><p class="sub mt8" style="font-size:12px">Learned from your orders. You can delete this history anytime in Profile.</p></div>
+   <div class="club mt16"><div class="row between"><span class="eyebrow" style="color:#E8D5A8">Flow Club</span><span class="pill" style="background:rgba(255,255,255,.12);color:#fff">${tier}</span></div>
+    <div class="serif" style="font-size:34px;margin-top:8px">${S.points.toLocaleString("en")} <span style="font-size:14px;font-family:'DM Sans';opacity:.7">FLOW POINTS</span></div>
+    <div class="prog"><i style="width:${Math.min(100,S.points/1500*100)}%"></i></div>
+    <div style="font-size:13px;margin-top:8px;opacity:.85">${toNext?`${toNext} points to your free drink`:"Free drink unlocked – redeem at any Flow point"}</div>
+    <div class="tiers"><span class="${tier==="Flow"?"on":""}">FLOW</span><span class="${tier==="Flow Plus"?"on":""}">FLOW PLUS</span><span class="${tier==="Flow Black"?"on":""}">FLOW BLACK</span></div>
+   </div>
+   <button class="card mt16 row between" style="width:100%;text-align:left" data-a="plus"><div><div class="eyebrow" style="color:var(--matcha)">Flow+ subscription</div><b>${S.plus?"You're a Flow+ member":"10 drinks a month for €14.99"}</b></div>${I.chev}</button>
+  </div>`;
+}
+
+function profileScreen(){
+  return `<div class="screen fade">
+   <div class="row" style="gap:14px"><div class="avatar" style="width:58px;height:58px;font-size:22px">${esc(S.user.name[0])}</div><div><h2 class="serif">${esc(S.user.name)}</h2><div class="sub">${esc(S.user.occ)} · ${S.user.age} · Roma</div></div></div>
+   <div class="card mt24"><b>Preferences</b><div class="chips mt12">${S.user.prefs.map(p=>`<span class="pill">${p==="free"?"Caffeine-free":CAT[p]?CAT[p].label:p}</span>`).join("")}</div>
+    <div class="sub mt12" style="font-size:13px">Caffeine: ${S.user.caffeine} · Diet: ${S.user.diet} · Wake ${S.user.wake} · Sleep ${S.user.sleep}</div></div>
+   <div class="menu mt16">
+    <button data-a="data"><span class="row">${I.shield}<span><b>My Data & Personalization</b></span></span>${I.chev}</button>
+    <button data-a="plus"><span><b>Flow+</b> <span class="sub">${S.plus?"Active":"€14.99/month"}</span></span>${I.chev}</button>
+    <button data-a="strategy"><span><b>Strategy behind Flow</b> <span class="sub">pitch mode</span></span>${I.chev}</button>
+    <button data-a="restart"><span><b>Restart onboarding</b></span>${I.chev}</button>
+   </div>
+   <p class="concept mt24">Concept prototype for a LUISS Corporate Strategy class.<br>Not affiliated with or endorsed by Lavazza. All data is simulated.</p>
+  </div>`;
+}
+
+/* ================= ONBOARDING ================= */
+function onboarding(){
+  const st=S.obStep;
+  if(st===0) return `<div class="ob-hero fade">
+    <div class="orb" style="width:300px;height:300px;right:-120px;top:-60px;background:radial-gradient(circle,#6E9A3C,transparent 70%);opacity:.6"></div>
+    <div class="orb" style="width:260px;height:260px;left:-120px;top:240px;background:radial-gradient(circle,#8A5A3B,transparent 70%);opacity:.55"></div>
+    <div style="position:relative"><div class="eyebrow" style="color:#A9C3FF">Lavazza · Flow</div>
+     <h1 class="serif" style="font-size:44px;margin-top:14px">Right drink.<br>Right place.<br>Right moment.</h1>
+     <div class="mt24">${[["8:15","Focus","espresso on your way to class"],["15:30","Refresh","iced matcha in the library"],["18:00","Fuel","hydration before the gym"],["21:30","Unwind","caffeine-free tea"]].map(([t,m,d])=>`<div class="flow-step"><b style="width:44px">${t}</b><span><b>${m}</b> · ${d}</span></div>`).join("")}</div></div>
+    <div style="position:relative"><button class="btn" style="background:#fff;color:var(--navy)" data-a="demo">START DEMO AS ANTONIO</button>
+     <button class="btn ghost mt12" style="color:#fff;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.5)" data-a="ob" data-v="1">Create my Flow</button>
+     <p class="concept mt16" style="color:rgba(255,255,255,.5)">Concept prototype · not affiliated with Lavazza</p></div>
+  </div>`;
+  const steps=`<div class="steps">${[1,2,3,4].map(i=>`<i class="${i<=st?"on":""}"></i>`).join("")}</div>`;
+  const u=S.user;
+  let body="";
+  if(st===1) body=`<div class="eyebrow mt24">About you</div><h1 class="serif mt8">Let's get to know you</h1>
+    <label class="field"><span>NAME</span><input id="f-name" value="${esc(u.name)}"></label>
+    <label class="field"><span>AGE</span><input id="f-age" type="number" value="${u.age}"></label>
+    <div class="field"><span>OCCUPATION</span><div class="chips">${["Student","Worker","Other"].map(o=>`<button class="chip ${u.occ===o?"on":""}" data-a="occ" data-v="${o}">${o}</button>`).join("")}</div></div>`;
+  if(st===2) body=`<div class="eyebrow mt24">Your taste</div><h1 class="serif mt8">What do you enjoy?</h1>
+    <div class="field"><span>BEVERAGES (PICK ANY)</span><div class="chips">${[["coffee","Coffee"],["matcha","Matcha"],["tea","Tea"],["cold","Cold drinks"],["functional","Functional drinks"],["protein","Protein drinks"]].map(([k,l])=>`<button class="chip ${u.prefs.includes(k)?"on":""}" data-a="pref" data-v="${k}">${l}</button>`).join("")}</div></div>
+    <div class="field"><span>DAILY CAFFEINE</span><div class="seg">${["None","Low","Moderate","High"].map(o=>`<button class="${u.caffeine===o?"on":""}" data-a="caf" data-v="${o}">${o}</button>`).join("")}</div></div>
+    <label class="field"><span>DIETARY PREFERENCES</span><select id="f-diet">${["None","Vegetarian","Vegan","Lactose-free","Gluten-free"].map(o=>`<option ${u.diet===o?"selected":""}>${o}</option>`).join("")}</select></label>`;
+  if(st===3) body=`<div class="eyebrow mt24">Your rhythm</div><h1 class="serif mt8">When does your day start?</h1>
+    <label class="field"><span>USUAL WAKE-UP TIME</span><input id="f-wake" type="time" value="${u.wake}"></label>
+    <label class="field"><span>USUAL BEDTIME</span><input id="f-sleep" type="time" value="${u.sleep}"></label>
+    <p class="sub mt16" style="font-size:13px">We use this to avoid suggesting caffeine too close to bedtime.</p>`;
+  if(st===4) body=`<div class="eyebrow mt24">Privacy</div><h1 class="serif mt8">You're in control</h1>
+    <p class="sub mt8">Flow uses your data, with your consent, only to personalize your experience. We never sell your data.</p>
+    <div class="card mt16" style="padding:4px 16px">${consentRows()}</div>
+    <p class="sub mt12" style="font-size:12px">You can change these choices or delete your history at any time in Profile → My Data & Personalization.</p>`;
+  return `<div class="screen no-nav fade">${steps}${body}
+   <div class="row mt32" style="gap:10px">${st>1?`<button class="btn light" style="flex:1" data-a="ob" data-v="${st-1}">Back</button>`:""}
+   <button class="btn" style="flex:2" data-a="${st<4?"ob":"finish"}" data-v="${st+1}">${st<4?"Continue":"Agree & start"}</button></div></div>`;
+}
+function consentRows(){
+  const rows=[["personal","Personalized recommendations","Uses your routine, preferences and orders"],["location","Location while using the app","To find Flow points on your route"],["calendar","Calendar access","Optional: read only times and places of events"],["history","Order history","To learn your habits. Delete anytime"],["offers","Personalized offers","Promotions based on your Flow"]];
+  return rows.map(([k,t,d])=>`<div class="trow"><div><b style="font-size:14px">${t}</b><small>${d}</small></div><button class="toggle ${S.consent[k]?"on":""}" role="switch" aria-checked="${S.consent[k]}" data-a="consent" data-v="${k}"></button></div>`).join("");
+}
+
+/* ================= SHEETS ================= */
+function sheet(){
+  const s=S.sheet; if(!s) return "";
+  let c="";
+  if(s.kind==="order") c=orderSheet(s);
+  if(s.kind==="done") c=doneSheet(s);
+  if(s.kind==="ev") c=evSheet(s);
+  if(s.kind==="plus") c=plusSheet();
+  if(s.kind==="data") c=dataSheet();
+  if(s.kind==="strategy") c=strategySheet();
+  return `<div class="overlay" data-a="closeBg"><div class="sheet" data-stop="1"><div class="grab"></div>${c}</div></div>`;
+}
+function orderSheet(s){
+  const p=P[s.pid]; const point=pt(s.point);
+  const sizeAdd=[-.3,0,.5][s.size]; const milkAdd=s.milk==="Oat"||s.milk==="Almond"?.3:0;
+  const subtotal=p.price+(p.milk!==undefined&&!p.food?sizeAdd:0)+(p.milk?milkAdd:0);
+  const total=subtotal+(s.addPair&&s.pair?P[s.pair].price:0);
+  const options=POINTS.filter(x=>x.products.includes(s.pid));
+  return `<div class="row between"><span class="eyebrow">${s.moment||"Order"}</span><button class="icon-btn" data-a="close">${I.close}</button></div>
+   <div class="row mt12" style="gap:14px">${pic(s.pid,64)}<div><h2 class="serif">${p.name}</h2><div class="sub" style="font-size:13px">${p.desc}</div></div></div>
+   <div class="field"><span>SIZE</span><div class="seg">${["Small","Regular","Large"].map((l,i)=>`<button class="${s.size===i?"on":""}" data-a="size" data-v="${i}">${l}${i===0?" −€0,30":i===2?" +€0,50":""}</button>`).join("")}</div></div>
+   ${p.milk?`<div class="field"><span>MILK</span><div class="chips">${["Whole","Oat","Almond","Lactose-free"].map(m=>`<button class="chip ${s.milk===m?"on":""}" data-a="milk" data-v="${m}">${m}</button>`).join("")}</div></div>`:""}
+   <div class="field"><span>SWEETNESS</span><div class="seg">${["None","Light","Regular"].map(m=>`<button class="${s.sweet===m?"on":""}" data-a="sweet" data-v="${m}">${m}</button>`).join("")}</div></div>
+   <label class="field"><span>PICK-UP AT</span><select data-a="point">${options.map(o=>`<option value="${o.id}" ${o.id===s.point?"selected":""}>${TYPES[o.type].label} · ${o.name}</option>`).join("")}</select></label>
+   <div class="row between mt8 sub" style="font-size:13px"><span>Ready in ~${p.prep+2} min</span><span>${point.walk} away</span></div>
+   ${s.pair?`<div class="eyebrow mt24">Complete your Flow</div><button class="xsell mt8 ${s.addPair?"on":""}" style="width:100%;text-align:left" data-a="pair">${pic(s.pair,44)}<div style="flex:1"><div style="font-size:13.5px">${esc(crossSellText(s.rec,s.pair))}</div><b style="font-size:13px">${P[s.pair].name} · ${eur(P[s.pair].price)}</b></div><span class="check">${s.addPair?I.check:""}</span></button>`:""}
+   <div class="total"><span class="sub">Total</span><span class="serif" style="font-size:26px">${eur(total)}</span></div>
+   <div class="sub" style="font-size:12px;text-align:right">+${Math.round(total*10)} Flow points${S.plus?" · Flow+ credit available":""}</div>
+   <button class="btn mt16" data-a="place" data-v="${total.toFixed(2)}">ORDER & PICK UP</button>`;
+}
+function qr(seed){
+  let x=seed; const rnd=()=>{x=(x*9301+49297)%233280;return x/233280};
+  const n=25,c=6; let r="";
+  const finder=(a,b)=>`<rect x="${a*c}" y="${b*c}" width="${7*c}" height="${7*c}" fill="#16192B"/><rect x="${a*c+c}" y="${b*c+c}" width="${5*c}" height="${5*c}" fill="#fff"/><rect x="${a*c+2*c}" y="${b*c+2*c}" width="${3*c}" height="${3*c}" fill="#16192B"/>`;
+  for(let i=0;i<n;i++)for(let j=0;j<n;j++){
+    const inF=(i<8&&j<8)||(i<8&&j>=n-8)||(i>=n-8&&j<8); if(inF) continue;
+    if(rnd()>.52) r+=`<rect x="${i*c}" y="${j*c}" width="${c}" height="${c}" fill="#16192B"/>`;
+  }
+  return `<svg width="150" height="150" viewBox="0 0 ${n*c} ${n*c}" aria-label="Pick-up QR code (simulated)">${r}${finder(0,0)}${finder(n-7,0)}${finder(0,n-7)}</svg>`;
+}
+function doneSheet(s){
+  const left=s.left; const pct=1-left/240;
+  return `<div style="text-align:center"><div class="eyebrow" style="color:var(--matcha)">Order confirmed · #${s.no}</div>
+   <h2 class="serif mt8">${left>0?`Ready in ${Math.ceil(left/60)} min`:"Ready for pick-up"}</h2>
+   <div class="ready-ring"><svg width="132" height="132"><circle cx="66" cy="66" r="58" stroke="#E5DFD3" stroke-width="8" fill="none"/><circle cx="66" cy="66" r="58" stroke="${left>0?"#1B2A5C":"#6E9A3C"}" stroke-width="8" fill="none" stroke-linecap="round" stroke-dasharray="${2*Math.PI*58}" stroke-dashoffset="${2*Math.PI*58*(1-pct)}" style="transition:stroke-dashoffset .9s linear"/></svg>
+    <div class="lbl"><div><div class="serif" style="font-size:26px">${left>0?hhmm(Math.floor(left/60)).slice(3)+":"+String(left%60).padStart(2,"0"):"✓"}</div><div class="sub" style="font-size:11px">${left>0?"preparing":"enjoy"}</div></div></div></div>
+   <div class="mt16 sub">${s.items}</div><b>${TYPES[pt(s.point).type].label} · ${pt(s.point).name}</b>
+   <div class="qr mt16">${qr(s.no)}<div class="sub mt8" style="font-size:12px">Scan at the counter or machine</div></div>
+   <div class="pill mt16" style="background:#E7F0DC;color:#4F7A22">+${s.earned} Flow points · ${S.points.toLocaleString("en")} total</div>
+   <button class="btn mt24" data-a="close">Done</button></div>`;
+}
+function evSheet(s){
+  const e=s.ev;
+  return `<div class="row between"><h2 class="serif">${s.isNew?"Add activity":"Edit activity"}</h2><button class="icon-btn" data-a="close">${I.close}</button></div>
+   <label class="field"><span>TIME</span><input id="e-time" type="time" value="${e.time}"></label>
+   <label class="field"><span>ACTIVITY</span><input id="e-title" value="${esc(e.title)}" placeholder="e.g. Study group"></label>
+   <label class="field"><span>PLACE</span><input id="e-place" value="${esc(e.place)}" placeholder="e.g. Roma Termini"></label>
+   <label class="field"><span>CATEGORY</span><select id="e-cat">${Object.entries(RCAT).map(([k,v])=>`<option value="${k}" ${e.cat===k?"selected":""}>${v.label}</option>`).join("")}</select></label>
+   <button class="btn mt24" data-a="saveEv">Save</button>`;
+}
+function plusSheet(){
+  return `<div class="row between"><span class="eyebrow" style="color:var(--matcha)">Subscription</span><button class="icon-btn" data-a="close">${I.close}</button></div>
+   <h1 class="serif mt8">Flow+</h1><div class="row" style="align-items:baseline;gap:6px;margin-top:6px"><span class="serif" style="font-size:30px">€14.99</span><span class="sub">/ month</span></div>
+   <div class="card mt16">${[["10 drink credits","Any drink, any Flow point"],["Personalized offers","Based on your Flow"],["Priority pick-up","Skip the queue at peak times"],["Exclusive products","Seasonal blends and early launches"],["2× Flow points","On every order"]].map(([a,b])=>`<div class="trow"><div><b style="font-size:14px">${a}</b><small>${b}</small></div><span class="check" style="background:var(--matcha);color:#fff;box-shadow:none">${I.check}</span></div>`).join("")}</div>
+   <button class="btn mt24" data-a="togglePlus">${S.plus?"Cancel Flow+":"Start 1-month free trial"}</button><p class="concept mt12">Cancel anytime. Simulated – no payment is taken.</p>`;
+}
+function dataSheet(){
+  return `<div class="row between"><span class="eyebrow">Settings</span><button class="icon-btn" data-a="close">${I.close}</button></div>
+   <h2 class="serif mt8">My Data & Personalization</h2>
+   <p class="sub mt8" style="font-size:13.5px">Privacy by design: every data source is opt-in and you can revoke it anytime. We process only what's needed for your recommendations and never sell your data.</p>
+   <div class="card mt16" style="padding:4px 16px">${consentRows()}</div>
+   <div class="card mt16"><b>What Flow knows</b><p class="sub mt8" style="font-size:13px">${S.routine.length} routine activities · ${S.week.drinks} orders this week · preferences: ${S.user.prefs.length}</p></div>
+   <button class="btn ghost mt16" data-a="wipe">Delete my order history</button>`;
+}
+function strategySheet(){
+  const pts=["Related diversification: new beverage categories next to coffee","Forward vertical integration: own stores, corners and smart machines","Direct-to-consumer relationship","Omnichannel / phygital strategy","Data-driven personalization","Contextual cross-selling","Higher customer share of wallet","Higher “share of day”","First-party data, never sold","Strategic tech partnership – Lavazza keeps data & IP"];
+  return `<div class="row between"><span class="eyebrow">Pitch mode</span><button class="icon-btn" data-a="close">${I.close}</button></div>
+   <div class="card mt12" style="background:var(--navy);color:#fff;text-align:center"><div class="eyebrow" style="color:#A9C3FF">From</div><div class="serif" style="font-size:22px">Selling coffee</div><div style="margin:6px 0;opacity:.6">↓</div><div class="eyebrow" style="color:#A9C3FF">To</div><div class="serif" style="font-size:22px">Managing daily consumption occasions</div></div>
+   <div class="card mt16">${pts.map((p,i)=>`<div class="row" style="align-items:flex-start;padding:7px 0"><b style="width:22px;color:var(--matcha)">${i+1}</b><span style="font-size:13.5px">${p}</span></div>`).join("")}</div>
+   <div class="card mt16"><b>Flow flywheel</b><div class="sub mt8" style="font-size:13px;line-height:1.9">Routine → Recommendation → Purchase → Behavioural data → Better recommendation → Cross-selling → New product development</div></div>`;
+}
+
+/* ================= RENDER ================= */
+function render(){
+  const app=$("#app");
+  const st=document.querySelector(".screen"); const scroll=st?st.scrollTop:0; const prevTab=render.tab;
+  let html = !S.onboarded ? onboarding() : ({home:homeScreen,routine:routineScreen,nearby:nearbyScreen,myflow:myflowScreen,profile:profileScreen}[S.tab])()+nav();
+  html += sheet();
+  if(S.toast) html+=`<div class="toast">${esc(S.toast)}</div>`;
+  app.innerHTML=html;
+  const ns=document.querySelector(".screen");
+  if(ns && prevTab===S.tab+S.onboarded+S.obStep){ns.scrollTop=scroll; ns.classList.remove("fade"); ns.querySelectorAll(".fade").forEach(e=>e.classList.remove("fade"))}
+  render.tab=S.tab+S.onboarded+S.obStep;
+  if(S.sheet){const sh=document.querySelector(".sheet"); if(S.sheet._scroll) sh.scrollTop=S.sheet._scroll; if(S.sheet._noanim){sh.style.animation="none";document.querySelector(".overlay").style.animation="none"} S.sheet._noanim=true}
+}
+function saveObFields(){
+  const g=id=>document.getElementById(id);
+  if(g("f-name")) S.user.name=g("f-name").value.trim()||"Antonio";
+  if(g("f-age")) S.user.age=+g("f-age").value||22;
+  if(g("f-diet")) S.user.diet=g("f-diet").value;
+  if(g("f-wake")) S.user.wake=g("f-wake").value||"07:15";
+  if(g("f-sleep")) S.user.sleep=g("f-sleep").value||"23:30";
+}
+function openOrder(rec, pointId){
+  const pid=rec?rec.pid:pt(pointId).products.find(k=>!P[k].food);
+  S.sheet={kind:"order",pid,point:pointId||rec.point,pair:rec?rec.pair:null,addPair:false,rec,moment:rec?rec.moment+" · "+rec.label:"Order ahead",size:1,milk:"Whole",sweet:"None"};
+}
+let timer=null;
+function place(total){
+  const s=S.sheet; const earned=Math.round(total*10*(S.plus?2:1));
+  S.points+=earned; S.week.drinks++; S.week.spent+=total; S.week.days[2]++;
+  const cat=P[s.pid].cat; const key=cat==="matcha"?"cold":cat==="free"||cat==="protein"?"functional":cat; S.week.mix[key]=(S.week.mix[key]||0)+1;
+  S.ordered.push({pid:s.pid,time:S.simTime});
+  const items=P[s.pid].name+(s.addPair&&s.pair?" + "+P[s.pair].name:"");
+  S.sheet={kind:"done",no:1000+Math.floor(Math.random()*9000),left:240,items,point:s.point,earned};
+  clearInterval(timer);
+  timer=setInterval(()=>{if(!S.sheet||S.sheet.kind!=="done"){clearInterval(timer);return} S.sheet.left=Math.max(0,S.sheet.left-20); if(!S.sheet.left)clearInterval(timer); render()},700);
+}
+
+document.addEventListener("click",e=>{
+  const el=e.target.closest("[data-a]"); if(!el) return;
+  const a=el.dataset.a, v=el.dataset.v;
+  if(a==="closeBg"){ if(e.target===el){S.sheet=null;render()} return; }
+  if(S.sheet){const sh=document.querySelector(".sheet"); if(sh) S.sheet._scroll=sh.scrollTop;}
+  switch(a){
+    case "demo": S.onboarded=true; S.tab="home"; break;
+    case "ob": saveObFields(); S.obStep=+v; break;
+    case "finish": saveObFields(); S.onboarded=true; S.tab="home"; break;
+    case "occ": S.user.occ=v; break;
+    case "pref": {const i=S.user.prefs.indexOf(v); i>=0?S.user.prefs.splice(i,1):S.user.prefs.push(v); break;}
+    case "caf": S.user.caffeine=v; break;
+    case "consent": S.consent[v]=!S.consent[v]; if(v==="calendar"&&S.consent[v]) {S.consent[v]=false; toast("Calendar sync is coming soon"); return} break;
+    case "tab": S.tab=v; S.mapSel=null; break;
+    case "sim": S.simTime=v; S.openWhy=null; break;
+    case "why": S.openWhy=S.openWhy===v?null:v; break;
+    case "order": {const r=buildFlow().find(x=>x.id===v); openOrder(r); break;}
+    case "orderAt": e.stopPropagation(); openOrder(null,v); break;
+    case "close": S.sheet=null; break;
+    case "size": S.sheet.size=+v; break;
+    case "milk": S.sheet.milk=v; break;
+    case "sweet": S.sheet.sweet=v; break;
+    case "pair": S.sheet.addPair=!S.sheet.addPair; break;
+    case "place": place(+v); break;
+    case "point": return;
+    case "addEv": S.sheet={kind:"ev",isNew:true,ev:{time:"10:00",title:"",place:"",cat:"study"}}; break;
+    case "editEv": S.sheet={kind:"ev",ev:{...S.routine.find(x=>x.id==v)}}; break;
+    case "delEv": S.routine=S.routine.filter(x=>x.id!=v); toast("Activity removed – your Flow has been updated"); return;
+    case "saveEv": {
+      const ev={time:$("#e-time").value||"10:00",title:$("#e-title").value.trim()||"Activity",place:$("#e-place").value.trim(),cat:$("#e-cat").value};
+      if(S.sheet.isNew){S.routine.push({id:S.nextId++,...ev})} else {Object.assign(S.routine.find(x=>x.id===S.sheet.ev.id),ev)}
+      S.sheet=null; toast("Routine saved – recommendations updated"); return;
+    }
+    case "cal": toast("Google & Apple Calendar sync: coming soon"); return;
+    case "filter": S.mapFilter=v; S.mapSel=null; break;
+    case "mapSel": S.mapSel=v; break;
+    case "plus": S.sheet={kind:"plus"}; break;
+    case "togglePlus": S.plus=!S.plus; S.sheet=null; toast(S.plus?"Welcome to Flow+":"Flow+ cancelled"); return;
+    case "data": S.sheet={kind:"data"}; break;
+    case "strategy": S.sheet={kind:"strategy"}; break;
+    case "wipe": S.week={drinks:0,places:0,spent:0,mix:{coffee:0,cold:0,functional:0,tea:0},days:[0,0,0,0,0,0,0]}; S.ordered=[]; S.sheet=null; toast("Order history deleted"); return;
+    case "restart": S.onboarded=false; S.obStep=0; S.sheet=null; break;
+  }
+  render();
+});
+document.addEventListener("change",e=>{
+  if(e.target.dataset.a==="point"&&S.sheet){S.sheet.point=e.target.value; S.sheet._scroll=document.querySelector(".sheet").scrollTop; render()}
+});
+render();
+</script>
+</body>
+</html>
